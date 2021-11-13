@@ -1,18 +1,7 @@
 ﻿using System;
+using System.Configuration;
 using System.IO.Ports;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace LED_Bottle
 {
@@ -33,6 +22,14 @@ namespace LED_Bottle
             Slider_G.IsEnabled = false;
             Slider_B.IsEnabled = false;
             Slider_W.IsEnabled = false;
+
+            if(Properties.Settings.Default.LastPort != "")
+            {
+                if(!ConnectCOM(Properties.Settings.Default.LastPort))
+                {
+                    Properties.Settings.Default.LastPort = "";
+                }
+            }
         }
 
         private void OnClosed(object sender, System.ComponentModel.CancelEventArgs e)
@@ -53,34 +50,48 @@ namespace LED_Bottle
             COM_List.SelectedIndex = ports.Length - 1; // select last item, often the correct port
         }
 
-        private void Button_Connection_Click(object sender, RoutedEventArgs e)
+        private bool ConnectCOM(string Portname)
         {
-            if (COM_List.SelectedIndex == -1) return;
-
-            if (_port != null) _port.Close();
-
             try
             {
-                SerialPort p = new SerialPort(COM_List.SelectedItem.ToString(), 115200);
+                SerialPort p = new SerialPort(Portname, 115200);
                 p.Open();
 
                 if (p.IsOpen)
                 {
                     _port = p;
-                    this.Title = "RGBW - Connected to " + COM_List.SelectedItem.ToString();
+                    this.Title = "RGBW - Connected to " + Portname;
 
                     // enable sliders
                     Slider_R.IsEnabled = true;
                     Slider_G.IsEnabled = true;
                     Slider_B.IsEnabled = true;
                     Slider_W.IsEnabled = true;
+
+                    return true;
                 }
                 else throw new Exception("Failed to open");
             }
             catch (Exception ex) // we fucked up
             {
                 MessageBox.Show("Failed to connect\n" + ex.Message, "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return; // disregard error and keep going
+                return false; // disregard error and keep going
+            }
+
+            return false;
+        }
+
+        private void Button_Connection_Click(object sender, RoutedEventArgs e)
+        {
+            if (COM_List.SelectedIndex == -1) return;
+
+            if (_port != null) _port.Close();
+
+            if (ConnectCOM(COM_List.SelectedItem.ToString()))
+            {
+                // only save if the connection was successful
+                Properties.Settings.Default.LastPort = COM_List.SelectedItem.ToString();
+                Properties.Settings.Default.Save();
             }
         }
 
