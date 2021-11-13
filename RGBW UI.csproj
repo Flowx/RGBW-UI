@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <RootNamespace>LED_Bottle</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>rgbw_icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="RGB LED Driver\**" />
+    <EmbeddedResource Remove="RGB LED Driver\**" />
+    <None Remove="RGB LED Driver\**" />
+    <Page Remove="RGB LED Driver\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="rgbw_icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="rgbw_icon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.IO.Ports" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="rgbw_icon.ico" />
+  </ItemGroup>
+
+</Project>
